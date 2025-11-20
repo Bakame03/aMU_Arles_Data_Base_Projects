@@ -137,3 +137,45 @@ INSERT INTO vol (NUMVOL, NUMPILOTE, NUMAVION, VILLEDEP, VILLEARR, HEUREDEP, HEUR
 INSERT INTO vol (NUMVOL, NUMPILOTE, NUMAVION, VILLEDEP, VILLEARR, HEUREDEP, HEUREARR, PRIX) VALUES('IRL051', 10, 12, 'Paris', 'Dublin', '08:00:00', '10:00:00', 650.00);
 INSERT INTO vol (NUMVOL, NUMPILOTE, NUMAVION, VILLEDEP, VILLEARR, HEUREDEP, HEUREARR, PRIX) VALUES('GB0052', 8, 5, 'Paris', 'Londres', '14:00:00', '15:00:00', 670.00);
 INSERT INTO vol (NUMVOL, NUMPILOTE, NUMAVION, VILLEDEP, VILLEARR, HEUREDEP, HEUREARR, PRIX) VALUES('GB0053', 4, 5, 'Londres', 'Mulhouse', '08:00:00', '10:10:00', 759.00);
+
+
+-- crire les requêtes en SQL permettant de réaliser les listes ou opérations qui suivent.
+1. Quels sont les noms et adresses des pilotes.
+SELECT nompilote, adresse FROM pilote;
+
+-- 2. Quelles sont les différentes villes de départ (sans doublon)
+SELECT DISTINCT villedep FROM vol;
+
+-- 3. Quels sont les vols (numéro, ville de départ, ville d'arrivée, heure de départ et heure
+-- d'arrivée et prix TTC) au départ de Paris entre 14h et 16h ?
+-- R em arque : les heures sont saisie dans la base de données au format 'hh:mm:ss'.
+-- Exem ple : pour 12h30 => '12:30:00'.
+SELECT numvol, villedep, villearr, heuredep, heurearr, prix*1.2 AS prix_ttc
+FROM vol
+WHERE villedep = 'Paris' AND heuredep BETWEEN '14:00:00' AND '16:00:00';
+
+-- 4. Quel est le numéro et nom des avions de type Airbus ? (Attention à la casse)
+SELECT NUMAVION, NOMAVION FROM AVION WHERE NOMAVION LIKE '%Airbus%';
+
+-- 5. Quels sont les pilotes dont le nom comprend un "i" en 2ème position ? 
+SELECT NOMPILOTE FROM PILOTE WHERE NOMPILOTE LIKE '_i%';
+
+-- 6. Quels sont les avions qui ont une capacité entre 200 et 300 ?
+SELECT * FROM AVION WHERE CAPACITE BETWEEN 200 AND 300;
+
+-- 7. Quels sont les avions (nom, numéros et localisation) ayant une capacité supérieure à 200  et 
+-- qui ne sont pas localiser à Nice, tri décroissant sur le numéro ? 
+SELECT NOMAVION, NUMAVION, LOCALISATION 
+FROM AVION 
+WHERE CAPACITE > 200 AND LOCALISATION <> 'Nice'
+ORDER BY NUMAVION DESC;
+
+-- 8. Quels sont les noms (sans doublon) des pilotes qui assurent un vol au départ de Paris ? 
+SELECT DISTINCT P.NOMPILOTE
+FROM PILOTE P, VOL V
+WHERE P.NUMPILOTE = V.NUMPILOTE AND V.VILLEDEP = 'Paris';
+
+-- 9. Quels sont les noms (sans doublon) des pilotes qui pilotent un Airbus ? 
+SELECT DISTINCT P.NOMPILOTE
+FROM PILOTE P, VOL V, AVION A
+WHERE P.NUMPILOTE = V.NUMPILOTE AND V.NUMAVION = A.NUMAVION AND A.NOMAVION LIKE '%Airbus%';
