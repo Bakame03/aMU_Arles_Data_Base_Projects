@@ -58,7 +58,7 @@ CONSTRAINT FK_CARAC_IDV FOREIGN KEY (IDV) REFERENCES VOYAGE (IDV) ,
 CONSTRAINT FK_CARAC_CODE FOREIGN KEY (CODE) REFERENCES OPTIONV (CODE) );
 
 /************************/
-/* Cr�ation des voyages */
+/* Cr�ation des voyages */
 /************************/
 
 INSERT INTO VOYAGE VALUES (867, 'LISBONNE', 'PORTUGAL', 'MARSEILLE', 'MONDIAL', 3, 2);
@@ -72,7 +72,7 @@ INSERT INTO VOYAGE VALUES (120, 'MARRAKECH', 'MAROC', 'MARSEILLE', 'EL ANDALOUS'
 INSERT INTO VOYAGE VALUES (857, 'ISTAMBUL', 'TURQUIE', 'PARIS', 'ANTIQUE', 5, 6);
 INSERT INTO VOYAGE VALUES (927, 'LARNACA', 'CHYPRE', 'PARIS', 'OLD BRIDGE', 4, 4);
 INSERT INTO VOYAGE VALUES (122, 'LIMASSOL', 'CHYPRE', 'PARIS', 'ELIAS BEACH', 5, 4);
-INSERT INTO VOYAGE VALUES ( 354, 'BOMBASA', 'KENYA', 'MARSEILLE', 'SAFARI JAMBO', 4, 7);
+INSERT INTO VOYAGE VALUES (354, 'BOMBASA', 'KENYA', 'MARSEILLE', 'SAFARI JAMBO', 4, 7);
 INSERT INTO VOYAGE VALUES (952, 'NAIROBI', 'KENYA', 'PARIS', 'BAMBURI', 3, 6);
 INSERT INTO VOYAGE VALUES (321, 'FEZ', 'MAROC', 'MARSEILLE', 'DAR AL BAHAR' , 4, 6);
 INSERT INTO VOYAGE VALUES (860, 'SEVILLE', 'ESPAGNE', 'MARSEILLE', 'EL ALMARANTE', 5, 4);
@@ -85,7 +85,7 @@ INSERT INTO VOYAGE VALUES (201, 'AGADIR', 'MAROC', 'TOULOUSE', 'TRANSATLANTIQUE'
 INSERT INTO VOYAGE VALUES (202, 'NAIROBI', 'KENYA', 'TOULOUSE', 'TRANSATLANTIQUE', 4, 6);
 
 /************************/
-/* Cr�ation des plannings*/
+/* Cr�ation des plannings*/
 /************************/
 
 INSERT INTO PLANNING VALUES (100, TO_DATE ('04/05/04', 'DD/MM/YY'), 470);
@@ -170,7 +170,7 @@ INSERT INTO PLANNING VALUES (869, TO_DATE ('07/08/04', 'DD/MM/YY'), 315);
 
 
 /************************/
-/* Cr�ation des options */
+/* Cr�ation des options */
 /************************/
 
 INSERT INTO OPTIONV VALUES (10, 'VISITE GUIDEE');
@@ -188,7 +188,7 @@ INSERT INTO OPTIONV VALUES (24, 'JACUZZI');
 
 
 /************************/
-/* Cr�ation des carac */
+/* Cr�ation des carac */
 /************************/
 
 INSERT INTO CARAC VALUES (354, 16, 36);
@@ -229,7 +229,7 @@ INSERT INTO CARAC VALUES (860, 13, NULL);
 INSERT INTO CARAC VALUES (860, 23, NULL);
 
 /************************/
-/* Cr�ation des clients */
+/* Cr�ation des clients */
 /************************/
 
 INSERT INTO CLIENT VALUES (2101, 'BARBIER', 'NICOLAS', '12 RUE DU CHERCHE MIDI', '75008', 'PARIS', NULL);
@@ -269,7 +269,7 @@ INSERT INTO CLIENT VALUES (2304, 'DUJARDIN', 'FRANCOIS', NULL, NULL, 'AIX', 'PRI
 
 
 /*****************************/
-/* Cr�ation des r�servations */
+/* Cr�ation des r�servations */
 /*****************************/
 
 INSERT INTO RESERVATION VALUES (2107, 122, TO_DATE ('20/06/04', 'DD/MM/YY'), 2, TO_DATE ('25/03/04', 'DD/MM/YY'));
@@ -304,6 +304,74 @@ INSERT INTO RESERVATION VALUES (2201, 867, TO_DATE ('05/04/04', 'DD/MM/YY'), 1, 
 INSERT INTO RESERVATION VALUES (2201, 869, TO_DATE ('07/08/04', 'DD/MM/YY'), 1, TO_DATE ('03/04/04', 'DD/MM/YY'));
 INSERT INTO RESERVATION VALUES (2202, 869, TO_DATE ('07/08/04', 'DD/MM/YY'), 1, TO_DATE ('25/06/04', 'DD/MM/YY'));
 INSERT INTO RESERVATION VALUES (2203, 867, TO_DATE ('15/05/04', 'DD/MM/YY'), 1, TO_DATE ('23/03/04', 'DD/MM/YY'));
+
+
+
+
+-- 1.1.Donner la liste des clients ;
+SELECT CONCAT(C.NOM,' ',C.PRENOM) AS "La Liste des clients"
+FROM CLIENT C;
+
+-- 1.2.Donner la liste des clients PRIVILEGIE (catégorie);
+SELECT CONCAT(C.NOM,' ',C.PRENOM) AS "La Liste des clients PRIVILEGIE"
+FROM CLIENT C
+WHERE C.CATEGORIE LIKE '%PRIVILEGIE%';
+
+-- 1.3.Donner le nom et prénom des clients qui habitent MARSEILLE;
+SELECT CONCAT(C.NOM,' ',C.PRENOM) AS "NOM & PRENOM DES CLIENTS QUI HABITENT A MARSEILLE"
+FROM CLIENT C
+WHERE C.VILLE LIKE '%MARSEILLE%';
+
+-- 1.4.Donner le nom des clients dont le prénom contient un R et qui habitent MARSEILLE;
+SELECT C.NOM AS "NOM DES CLIENTS DONT LEUR PRENOM CONTIENT UN R ET QUI HABITENT A MARSEILLE"
+FROM CLIENT C
+WHERE C.VILLE LIKE '%MARSEILLE%'
+AND C.PRENOM LIKE '%R%';
+
+-- 1.5.Donner le numéro de client (numcl) et l'identifiant du voyage (idv) 
+-- des réservations pour lesquelles la date de réservation 
+-- est comprise entre mars 2003 et janvier 2004 (bornes incluses)
+SELECT C.NUMCL, R.IDV
+FROM CLIENT C JOIN RESERVATION R USING(NUMCL)
+WHERE R.DATERES BETWEEN '2003-03-01' AND '2004-01-31';  
+
+-- 1.6.donner  l'identifiant  du  voyage  (idv)  et  la  durée  des  voyages  
+-- qui  ont  comme  destination  le MAROCou que l'hôtel est le ANTIQUE
+SELECT V.IDV, V.DUREE
+FROM VOYAGE V
+WHERE V.PAYSARR = 'MAROC'
+OR V.HOTEL = 'ANTIQUE';
+
+-- 1.7.Quelles sont les villes d'arrivée des voyages à destination du Maroc ?
+SELECT DISTINCT V.VILLEARR
+FROM VOYAGE V
+WHERE V.PAYSARR LIKE '%MAROC%';
+
+-- 1.8.Donnez toutes les informations sur les options dont le libellé comporte le mot VISITE.
+SELECT *
+FROM OPTIONV
+WHERE OPTIONV.LIBELLE LIKE '%VISITE%'
+
+-- 1.9.Donnez  la  liste,  triée  en  ordre  croissant,  des  dates  de  départ plannifiées
+--   (pour  le  voyage d'identifiant 927 entre le 1er juin et le 30 juillet 2004.
+SELECT P.DATEDEP
+FROM PLANNING P JOIN VOYAGE V ON P.IDV = V.IDV
+WHERE V.IDV = 927
+AND P.DATEDEP BETWEEN '2004-06-01' AND '2004-07-30'
+ORDER BY 1;
+
+-- 1.10.Donnez la liste des clients (leur identifiant, nom et prénom) 
+-- n'habitant ni Paris ni Marseille. Présentez cette liste triée selon l'identifiant.
+SELECT C.NUMCL AS "IDENTIFIANT", C.NOM, C.PRENOM
+FROM CLIENT C
+WHERE C.VILLE NOT IN ('PARIS', 'MARSEILLE')
+ORDER BY 1;
+
+-- 1.11.Quels  sont  les  clients  (identifiant  et  nom)  
+-- dont  l'adresse  n'est  pas  valorisée  dans  la  base (pas de valeur) ?
+SELECT C.NUMCL AS "IDENTIFIANT", C.NOM
+FROM CLIENT C
+WHERE C.ADRESSE IS NULL;
 
 
 
