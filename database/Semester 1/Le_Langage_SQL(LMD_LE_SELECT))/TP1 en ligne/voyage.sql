@@ -307,7 +307,7 @@ INSERT INTO RESERVATION VALUES (2203, 867, TO_DATE ('15/05/04', 'DD/MM/YY'), 1, 
 
 
 
-
+-- Partie 1 : Requêtes SELECT simples
 -- 1.1.Donner la liste des clients ;
 SELECT CONCAT(C.NOM,' ',C.PRENOM) AS "La Liste des clients"
 FROM CLIENT C;
@@ -373,6 +373,88 @@ SELECT C.NUMCL AS "IDENTIFIANT", C.NOM
 FROM CLIENT C
 WHERE C.ADRESSE IS NULL;
 
+-- Partie 2 : 
+-- LES SOUS REQUETESet opérateurs ensemblistes
+-- 1.1.Quels sont les voyages (identifiant et destination) dont le tarif est le plus faible ?
+SELECT V.IDV, V.VILLEARR
+FROM VOYAGE V
+WHERE V.IDV IN (
+    SELECT P.IDV
+    FROM PLANNING P
+    WHERE P.TARIF = (
+        SELECT MIN(P2.TARIF)
+        FROM PLANNING P2
+    )
+);
 
+-- 1.2.Pour quelle destination part le voyage le plus cher ?
+SELECT V.VILLEARR, V.PAYSARR
+FROM VOYAGE V
+WHERE V.IDV IN (
+      SELECT P.IDV
+      FROM PLANNING P
+      WHERE P.TARIF = (
+              SELECT MAX(P2.TARIF)
+              FROM PLANNING P2
+      )
+);
 
+-- 1.3.Quelles  sont  les  villes  de  départ  
+-- des  voyages  correspondant  à  une  ville  
+-- dans laquelle résident des clients ?
+-- Donner deux formulations possibles
+-- Première formulation avec IN
+SELECT DISTINCT V.VILLEDEP
+FROM VOYAGE V
+WHERE V.VILLEDEP IN (
+    SELECT C.VILLE
+    FROM CLIENT C
+);
+-- Deuxième formulation avec EXISTS
+SELECT DISTINCT V.VILLEDEP
+FROM VOYAGE V
+WHERE EXISTS (
+    SELECT C.VILLE
+    FROM CLIENT C   
+    WHERE C.VILLE = V.VILLEDEP
+);
+
+-- 1.4.Quel est le libellé des options communes aux voyages 354 et 952 ? 
+-- Donner deux formulations possibles
+-- Première formulation avec IN
+SELECT OV.LIBELLE
+FROM OPTIONV OV
+WHERE OV.CODE IN (
+      SELECT CA.CODE
+      FROM CARAC CA
+      WHERE CA.IDV = 354
+)
+AND OV.CODE IN (
+      SELECT CA.CODE
+      FROM CARAC CA
+      WHERE CA.IDV = 952
+);
+-- Deuxième formulation avec INTERSECT
+SELECT OV.LIBELLE
+FROM OPTIONV OV
+WHERE OV.CODE IN (
+      SELECT CA.CODE
+      FROM CARAC CA
+      WHERE CA.IDV = 354
+      INTERSECT 
+      SELECT CA.CODE
+      FROM CARAC CA
+      WHERE CA.IDV = 952
+);
+
+-- 1.5.Existe-t-il  des  voyages, identifiant  et destination(ville  et  pays  d'arrivée),
+--   pour lesquels il n'y a aucune réservation ?
+-- Donner trois formulationspossibles
+-- Première formulation avec NOT IN
+SELECT V.IDV, V.VILLEARR, V.PAYSARR
+FROM VOYAGE V
+WHERE V.IDV NOT IN(
+      SELECT R.IDV
+      FROM RESERVATION R
+);
 
