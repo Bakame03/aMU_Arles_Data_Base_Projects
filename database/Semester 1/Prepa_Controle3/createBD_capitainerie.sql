@@ -259,6 +259,153 @@ INSERT INTO SEJOUR (NUMSEJ, NUMEMP, NUMBAT, CODEAG, DATEARRIVEE, DUREESEJ, PROVE
 -- initialisation de la valeur du compteur de séquence
 select setval('sejour_numsej_seq',7);
 
+-- 1)Donner la liste des emplacements (numéro et nom)
+--  pouvant accueillir les bateaux d'une longueur de 50m avec un tirant d'eau de 15m.
+-- Réponse :
+SELECT NUMEMP, NOMEMP
+FROM EMPLACEMENT
+WHERE LONGUEUREMP >= 50 AND TIRANTEAUMAX >= 15;
+
+-- 2)Donnerla  liste  des  emplacements  disposant  d'un  tirant  d'eau  et  d'une  longueur 
+-- suffisant  pour  accueillir  le  bateau  nommé  NORSTONE  (nom  de  l'emplacement, longueur, tirant d'eau maximum);
+-- Réponse :
+SELECT EMP.NOMEMP, EMP.LONGUEUREMP, EMP.TIRANTEAUMAX
+FROM EMPLACEMENT EMP, BATEAU BAT
+WHERE EMP.LONGUEUREMP >= (SELECT BAT.LONGUEURBAT
+                      WHERE BAT.NOMBAT LIKE 'NORSTONE')
+AND EMP.TIRANTEAUMAX >= (SELECT BAT.TIRANTEAU
+                      WHERE BAT.NOMBAT LIKE 'NORSTONE');
+
+-- 3)Donner le nom des agents qui ne gèrent aucun séjour ;
+-- Réponse :
+SELECT AG.NOMAG
+FROM AGENT AG
+WHERE AG.CODEAG NOT IN (SELECT SEJ.CODEAG
+                        FROM SEJOUR SEJ);
+
+--!!!!!!!!!!!!!!!!!!!!!!!!!!!! 4)Donner  lenom  du  bateau  qui  a  séjournéle  plus  longtemps  (durée  cumulée)  dans  le port;
+-- Réponse :
+SELECT BAT.NOMBAT
+FROM BATEAU BAT
+WHERE BAT.NUMBAT = (SELECT SEJ.NUMBAT
+                    FROM SEJOUR SEJ
+                    GROUP BY SEJ.NUMBAT
+                    HAVING SUM(SEJ.DUREESEJ) >= ALL (SELECT SUM(SEJ2.DUREESEJ)
+                                         FROM SEJOUR SEJ2
+                                         GROUP BY SEJ2.NUMBAT));
+
+-- 5)Toutes les informations de l'emplacement le plus long ;
+-- Réponse :
+SELECT NUMEMP,CODETYPEF, NOMEMP, LONGUEUREMP, TIRANTEAUMAX, TARIFJOUR
+FROM EMPLACEMENT
+ORDER BY LONGUEUREMP DESC
+LIMIT 1;
+
+-- 6)Listes des bateaux (nom du bateau) qui transportent des Céréales(libfret)
+-- Réponse :
+SELECT BAT.NOMBAT
+FROM BATEAU BAT
+WHERE BAT.NUMBAT IN (SELECT TRA.NUMBAT
+                     FROM TRANSPORTER TRA
+                     WHERE TRA.CODETYPEF IN (SELECT FR.CODETYPEF
+                                             FROM FRET FR
+                                             WHERE FR.LIBFRET LIKE '%Céréale%'));
+
+-- 7)Listes  des  bateaux  (nom  du  bateau)  qui  ont  transporté  des  Céréale  ET  du  Nickel (libfret)
+-- Réponse :
+SELECT BAT.NOMBAT
+FROM BATEAU BAT JOIN TRANSPORTER TRA 
+ON BAT.NUMBAT = TRA.NUMBAT
+JOIN FRET FR
+ON FR.CODETYPEF = TRA.CODETYPEF
+WHERE FR.LIBFRET LIKE '%Céréale%'
+INTERSECT
+SELECT BAT.NOMBAT
+FROM BATEAU BAT JOIN TRANSPORTER TRA 
+ON BAT.NUMBAT = TRA.NUMBAT
+JOIN FRET FR
+ON FR.CODETYPEF = TRA.CODETYPEF
+WHERE FR.LIBFRET LIKE '%Nickel%';
+
+-- 8)Donnez  la  liste  des  agents  (toutes  les  informations)  qui  habitent  Marseille  ou Montpellier
+-- Réponse :
+SELECT *
+FROM AGENT
+WHERE VILLEAG LIKE '%Marseille%' OR VILLEAG LIKE '%Montpellier%';
+
+-- 9)Listes des bateaux (nom du bateau) qui ont transporté des Produits pétroliers mais pas de Bois (libfret)
+-- Réponse :
+SELECT BAT.NOMBAT
+FROM BATEAU BAT JOIN TRANSPORTER TRA
+ON BAT.NUMBAT = TRA.NUMBAT
+JOIN FRET FR
+ON FR.CODETYPEF = TRA.CODETYPEF
+WHERE FR.LIBFRET LIKE '%pétroliers%'
+EXCEPT
+SELECT BAT.NOMBAT
+FROM BATEAU BAT JOIN TRANSPORTER TRA
+ON BAT.NUMBAT = TRA.NUMBAT
+JOIN FRET FR
+ON FR.CODETYPEF = TRA.CODETYPEF
+WHERE FR.LIBFRET LIKE '%Bois%';
+
+-- 10)Afficher le nom du bateau le plus long
+-- Réponse :
+SELECT NOMBAT
+FROM BATEAU
+ORDER BY LONGUEURBAT DESC
+LIMIT 1;
+
+-- 11)Donnez les numéros des emplacements qui peuvent recevoir des Céréales (libfret)
+-- Réponse :
+SELECT EMP.NUMEMP
+FROM EMPLACEMENT EMP JOIN FRET FR
+ON EMP.CODETYPEF = FR.CODETYPEF
+WHERE FR.LIBFRET LIKE '%Céréale%';
+
+-- 12)Donnez le montant total de chaque séjour (numéro du séjour, numéro de l’emplacement du  séjour,  
+-- provenance  et  destination  du  séjour,  le  tarif  du  séjour)
+--   Attention  vous renommerez les colonnes pourobtenir cet affichage
+-- Réponse :
+SELECT SEJ.NUMSEJ AS "N° du séjour", SEJ.NUMEMP AS "N° de l'emplacement", SEJ.PROVENANCE, SEJ.DESTINATION , (EMP.TARIFJOUR*SEJ.DUREESEJ) AS "Tarif total"
+from SEJOUR SEJ join EMPLACEMENT EMP USING(NUMEMP);
+
+-- 13)Donnez le montant total payé par armateur pour les séjours concernés par les bateaux qu’ils affrètent.
+-- Réponse :
+SELECT ARM.NOM_ARMAT, SUM(EMP.TARIFJOUR*SEJ.DUREESEJ) AS "Montant total payé "
+from SEJOUR SEJ JOIN EMPLACEMENT EMP USING(NUMEMP)
+JOIN BATEAU BAT 
+ON BAT.NUMBAT = SEJ.NUMBAT
+JOIN ARMATEUR ARM 
+ON ARM.NUM_ARMAT = BAT.NUM_ARMAT
+GROUP BY 1;
+
+-- 14)Donnez le nombre d’emplacementsparfret (libfret), en effet un emplacement est prévu pour accueillir un seul type de fret, 
+-- on veut donc connaitre le nombre d’emplacementsqui peuvent accueillir chaque type de fret!
+-- Réponse :
+SELECT FR.LIBFRET, COUNT(EMP.CODETYPEF) AS "Nombre d'emplacement"
+FROM EMPLACEMENT EMP JOIN FRET FR USING(CODETYPEF)
+GROUP BY 1;
+
+-- 15)Donnez le  bateau  qui a  transporté  le moins de  fret, quel  quesoit le  fret,  
+-- en effetun bateau a  pu  transporter plusieurstype  de  fret,  
+-- par  exemple  le  bateau Erikaka a transporté  256tonnes  de Produits  pétrolierset 3456tonnes  de  Bois,  
+-- on  veut  doncconnaitre celui qui a transportéla plus petitequantité de fretcumulé!
+-- Réponse :
+SELECT BAT.NOMBAT, SUM(TRA.QTEFRET)
+FROM BATEAU BAT JOIN TRANSPORTER TRA 
+ON BAT.NUMBAT = TRA.NUMBAT
+GROUP BY BAT.NUMBAT
+ORDER BY 2 ASC
+LIMIT 1;
+
+
+
+
+
+
+
+
 
 
 
