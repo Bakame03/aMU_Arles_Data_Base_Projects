@@ -283,16 +283,13 @@ FROM AGENT AG
 WHERE AG.CODEAG NOT IN (SELECT SEJ.CODEAG
                         FROM SEJOUR SEJ);
 
---!!!!!!!!!!!!!!!!!!!!!!!!!!!! 4)Donner  lenom  du  bateau  qui  a  séjournéle  plus  longtemps  (durée  cumulée)  dans  le port;
+-- 4)Donner  lenom  du  bateau  qui  a  séjournéle  plus  longtemps  (durée  cumulée)  dans  le port;
 -- Réponse :
-SELECT BAT.NOMBAT
-FROM BATEAU BAT
-WHERE BAT.NUMBAT = (SELECT SEJ.NUMBAT
-                    FROM SEJOUR SEJ
-                    GROUP BY SEJ.NUMBAT
-                    HAVING SUM(SEJ.DUREESEJ) >= ALL (SELECT SUM(SEJ2.DUREESEJ)
-                                         FROM SEJOUR SEJ2
-                                         GROUP BY SEJ2.NUMBAT));
+SELECT BAT.NOMBAT, SUM(SEJ.DUREESEJ)
+FROM BATEAU BAT JOIN SEJOUR SEJ USING (NUMBAT)
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 1;
 
 -- 5)Toutes les informations de l'emplacement le plus long ;
 -- Réponse :
