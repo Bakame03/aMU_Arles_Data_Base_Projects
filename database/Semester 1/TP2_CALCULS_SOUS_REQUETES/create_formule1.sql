@@ -1244,3 +1244,11 @@ ALTER TABLE ONLY tp_formule1.voiture
 -- PostgreSQL database dump complete
 --
 
+--!!!!!!!!!!!!!!!-----> To ask teacher 1.Donner le nomet prénom des pilotes et le nom du grand prix sur lequel ils ont abandonnée,
+--  trié sur le grand prix et le nom du pilote
+SELECT p.nom, p.prenom, g.nomgp
+FROM tp_formule1.pilote p, tp_formule1.courir c, tp_formule1.grandprix g
+WHERE p.idpilote = c.idpilote
+AND c.idgp = g.idgp
+AND c.positionarrivee
+
