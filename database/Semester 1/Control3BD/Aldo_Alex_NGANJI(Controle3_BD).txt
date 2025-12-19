@@ -1,0 +1,130 @@
+1. rep:
+SELECT titreLivre
+FROM livre
+WHERE auteurLivre LIKE '%Victor Hugo%'
+AND categLivre IN (SELECT categLivre
+                   FROM categorie
+                   WHERE libCategorie LIKE '%Théâtre%');
+                   
+                   
+2. rep:
+SELECT titreLivre
+FROM livre
+WHERE auteurLivre LIKE '%Jacques Prévert%' OR auteurLivre LIKE '%Gilbert Sinoué%';
+
+3. rep:
+SELECT nomMembre
+FROM membre
+WHERE adrMembre NOT LIKE '%Marseille%';
+
+4. rep:
+SELECT nomMembre
+FROM membre
+WHERE adrMembre IN (SELECT adrBiblio
+                    FROM biblio);
+                    
+5. rep:
+SELECT titreLivre, auteurLivre
+FROM livre
+WHERE IdLivre NOT IN (SELECT IdLivre
+                      FROM emprunt);
+                      
+6. rep:
+SELECT nomMembre
+FROM membre JOIN emprunt USING(IdMembre)
+JOIN livre USING (IdLivre)
+WHERE titreLivre LIKE '%Ruy Blas%';
+
+7. rep:
+SELECT titreLivre
+FROM livre
+WHERE IdLivre IN (SELECT IdLivre
+                  FROM emprunt
+                  WHERE dateEmprunt BETWEEN '2010-01-16' AND '2010-06-15');
+               
+8. rep:
+SELECT DISTINCT IdMembre
+FROM membre JOIN emprunt USING (IdMembre)
+JOIN livre USING (IdLivre)
+JOIN biblio USING (IdBiblio)
+WHERE adrBiblio LIKE '%Marseille%'
+AND EXTRACT(DAY from dateEmprunt) >= 7;
+
+9. rep:
+SELECT DISTINCT nomMembre
+FROM membre JOIN emprunt USING (IdMembre)
+JOIN livre USING (IdLivre)
+WHERE titreLivre NOT LIKE '%Avicenne%';
+
+10. rep:
+SELECT DISTINCT nomMembre
+FROM membre JOIN emprunt USING (IdMembre)
+JOIN livre USING (IdLivre)
+WHERE titreLivre LIKE '%Contes pour les enfants pas sages%'
+INTERSECT
+SELECT DISTINCT nomMembre
+FROM membre JOIN emprunt USING (IdMembre)
+JOIN livre USING (IdLivre)
+WHERE titreLivre LIKE '%Avicenne%';
+
+11. rep:
+SELECT DISTINCT IdMembre, nomMembre
+FROM membre JOIN emprunt USING (IdMembre)
+JOIN livre USING (IdLivre)
+WHERE auteurLivre LIKE '%Victor Hugo%'
+INTERSECT
+SELECT DISTINCT IdMembre, nomMembre
+FROM membre JOIN emprunt USING (IdMembre)
+JOIN livre USING (IdLivre)
+WHERE titreLivre NOT LIKE '%Jacques Prévert%';
+
+12. rep:
+SELECT titreLivre, Max(dureeEmprunt) AS"Le durée maximum d’emprunt", MIN(dureeEmprunt) AS"Le durée minimum d’emprunt"
+FROM livre JOIN emprunt USING (IdLivre)
+GROUP BY 1;
+
+13. rep:
+SELECT categLivre, COUNT(idLivre) AS"Nombre de livres pour cette categorie"
+FROM categorie JOIN livre USING(categLivre)
+GROUP BY 1
+ORDER BY 2 DESC;
+
+14. rep:
+SELECT L.titreLivre, L.auteurLivre, COUNT(E.IdLivre)
+FROM livre L JOIN emprunt E
+ON L.IdLivre = E.IdLivre
+GROUP BY 1, 2;
+
+15. rep:
+
+   
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
+               
