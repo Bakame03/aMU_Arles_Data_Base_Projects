@@ -1,5 +1,3 @@
-
-
 create schema BD_Matski;
 set search_path  = BD_Matski;
 
@@ -626,3 +624,24 @@ ALTER TABLE ONLY tarifvente
 -- PostgreSQL database dump complete
 --
 
+
+-- 1.L’entreprise désire également que vous interrogiez les données afin de faire une analyse des données économiques de l’entreprise.
+-- a.Il semble en effet que certains articles ou catégories ne soient jamais commandés est-ce le cas?
+-- Vous écrirez 2 requêtes pour afficher la ou les articles qui ne sont jamais commandés 
+-- et une autre pour les catégories qui ne sont pas les commandes
+-- Articles jamais commandés
+SELECT NOMARTICLE 
+FROM ARTICLE
+WHERE NUMARTICLE NOT IN (SELECT NUMARTICLE
+                         FROM DETAILCOMMANDE);
+-- Catégories jamais commandées
+SELECT *
+FROM CATEGORIE
+WHERE NUMCATEGORIE NOT IN (SELECT NUMCATEGORIE 
+                       FROM ARTICLE JOIN DETAILCOMMANDE USING(NUMARTICLE));
+
+
+-- b.Une action commerciale a été menée début septembre 2022 sur les clients basés en Suisse 
+-- l’entreprise souhaiterait savoir s’il y a eu un effet sur les commandes. 
+-- Il s’agit ici d’afficher le montant total des commandes par mois pour les clients suisses, 
+-- pour s’il y a eu une évolution!

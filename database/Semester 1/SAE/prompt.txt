@@ -17,7 +17,7 @@ here is the context area the company is operating on:
 
 (-) Matski est dans la revente de materiels de ski et de materiels de montagne
 (-) elle a ete created en 1984 sous l'impulsion de trois entrepreneurs a Annecy(Haute savoie)
-(-) Matski propose trois de produits: 1. les articles pour les skieurs alpins et les skieurs de montagnes
+(-) Matski propose trois types de produits: 1. les articles pour les skieurs alpins et les skieurs de montagnes
                                       2. les accessoires pour les skieurs alpins et les skieurs de montagnes
                                       3. les luges en bois et en plastiques
 
