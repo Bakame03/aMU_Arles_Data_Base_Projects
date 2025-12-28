@@ -645,3 +645,42 @@ WHERE NUMCATEGORIE NOT IN (SELECT NUMCATEGORIE
 -- l’entreprise souhaiterait savoir s’il y a eu un effet sur les commandes. 
 -- Il s’agit ici d’afficher le montant total des commandes par mois pour les clients suisses, 
 -- pour s’il y a eu une évolution!
+-- Montant total des commandes par mois pour les clients suisses
+SELECT TO_CHAR(DATECOMMANDE, 'YYYY-MM') AS "Les mois", SUM(MONTANTHT) AS "Montant total des commandes par mois pour les clients suisse"
+FROM COMMANDE JOIN CLIENT USING (NUMCLIENT)
+WHERE ADRESSEPAYSCLIENT LIKE '%Suisse%'
+GROUP BY 1;
+
+-- c.Existe-t-il des clients qui n’ont jamais passé de commande?
+-- Clients n'ayant jamais passé de commande
+SELECT NOMCLIENT AS "les clients qui n’ont jamais passé de commande"
+FROM CLIENT
+WHERE NUMCLIENT NOT IN(SELECT NUMCLIENT
+                       FROM COMMANDE);
+
+-- d.Il semble que certaines commandes ne soient pas livrées totalement, 
+-- le phénomène est-il inquiétant?
+-- Afficher les numéros de commande, la date dela commande, les quantités commandéeset les livrées et la différenceentreles deux. 
+-- Seules les commandes qui nesont pas totalement livrées nous intéressent.
+-- Commandes non totalement livrées
+SELECT C.NUMCOMMANDE, C.DATECOMMANDE, DC.QUANTITECOMMANDEE, DC.QUANTITELIVREE, (DC.QUANTITECOMMANDEE - DC.QUANTITELIVREE) AS "la différence entre les deux"
+FROM COMMANDE C JOIN DETAILCOMMANDE DC USING (NUMCOMMANDE)
+WHERE DC.QUANTITECOMMANDEE - DC.QUANTITELIVREE != 0;
+
+-- e.
+-- prix total des articles commandéset le prix total des articles livrés pour chaque type de vente
+SELECT 
+    E.CODETYPETVA,
+    E.LIBELLEETIQUETTE AS "Localisation",
+    SUM(DC.QUANTITECOMMANDEE * A.PRIXVENTE) AS "Prix total des articles commandés",
+    SUM(DC.QUANTITELIVREE * A.PRIXVENTE) AS "Prix total des articles livrés"
+FROM DETAILCOMMANDE DC
+JOIN ARTICLE A ON DC.NUMARTICLE = A.NUMARTICLE
+JOIN COMMANDE C ON DC.NUMCOMMANDE = C.NUMCOMMANDE
+JOIN CLIENT CL ON C.NUMCLIENT = CL.NUMCLIENT
+JOIN ETIQUETTE E ON CL.CODEETIQUETTE = E.CODEETIQUETTE
+GROUP BY 1,2
+ORDER BY 1;
+
+
+
