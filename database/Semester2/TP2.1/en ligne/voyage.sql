@@ -299,3 +299,30 @@ INSERT INTO RESERVATION VALUES (2203, 867, TO_DATE ('15/05/04', 'DD/MM/YY'), 1, 
 
 
 
+-- 1.1 AJOUT DE COLONNE
+-- On souhaite intégrer dans la relation
+-- planning un deuxième tarif de voyage pour les enfants. Effectuer
+-- l'ajout de cet attribut
+-- tarifenf dans la relation en utilisant le même type de données que pour la colonne
+-- tarif. De manière similaire, le nombre d'enfants doit être ajouté dans la relation
+-- reservation. Donnez à
+-- cet attribut
+-- nbenf le même type que celui de
+-- nbpers.
+ALTER TABLE PLANNING
+ADD tarifenf NUMERIC(6,2);
+
+ALTER TABLE RESERVATION
+ADD nbenf NUMERIC(2,0);
+
+-- 1.2 MODIFICATION DE TYPE D’UN COLONNE
+-- On souhaite étendre la définition du type de l'attribut
+-- libelle de la table
+-- optionv, en augmentant la
+-- taille du nombre de caractères admissibles de 10 caractères. Consultez la définition de cet attribut puis
+-- effectuez la modification correspondante et vérifiez-la
+ALTER TABLE OPTIONV
+ALTER COLUMN LIBELLE TYPE VARCHAR(30);
+
+
+
