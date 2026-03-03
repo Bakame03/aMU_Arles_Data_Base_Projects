@@ -14070,5 +14070,36 @@ alter table reserver
 -- 
 alter table telephone
   add constraint fk_telcli foreign key (cli_id) references client (cli_id) ;
+  
+  
+ 
+-- 1.1 
+-- Les prix (table couter : chb_prix) de toutes les chambres qui ont été réservées en 2001 et majoré de 33%.
+UPDATE Couter 
+SET CHB_PRIX = CHB_PRIX * 1.33
+WHERE CHB_ID IN (SELECT R.CHB_ID
+                 FROM RESERVER R
+                 WHERE EXTRACT(YEAR from R.date_jour) = 2001);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   
