@@ -14081,6 +14081,118 @@ WHERE CHB_ID IN (SELECT R.CHB_ID
                  FROM RESERVER R
                  WHERE EXTRACT(YEAR from R.date_jour) = 2001);
 
+-- 1.2
+-- Mettre le nom des clients en majuscule et la première lettre du prénom en majuscule.
+UPDATE client
+SET NOM = UPPER(NOM),
+    PRENOM = INITCAP(PRENOM);
+
+-- 1.3
+-- Le client dénommé PHILIPPE André (nom, prénom) nous a malheureusement quitté, il doit
+-- être supprimé de la base de données. Ecrire le(s) requête(s) qui permettent de réaliser cette
+-- suppression ;
+DELETE FROM RESERVER
+WHERE CLI_ID IN (SELECT CLI_ID
+                 FROM client
+                 WHERE NOM LIKE 'PHILIPPE'
+                       AND PRENOM LIKE 'André');
+
+DELETE FROM telephone
+WHERE CLI_ID IN (SELECT CLI_ID
+                 FROM client
+                 WHERE NOM LIKE 'PHILIPPE'
+                       AND PRENOM LIKE 'André');
+
+DELETE FROM adresse
+WHERE CLI_ID IN (SELECT CLI_ID
+                 FROM client
+                 WHERE NOM LIKE 'PHILIPPE'
+                       AND PRENOM LIKE 'André');
+
+DELETE FROM email
+WHERE CLI_ID IN (SELECT CLI_ID
+                 FROM client
+                 WHERE NOM LIKE 'PHILIPPE'
+                       AND PRENOM LIKE 'André');
+
+DELETE FROM ligne_facture
+WHERE FAC_ID IN (SELECT FAC_ID
+                 FROM facture JOIN client C USING(CLI_ID) 
+                 WHERE NOM LIKE 'PHILIPPE'
+                       AND PRENOM LIKE 'André');
+
+
+DELETE FROM facture
+WHERE CLI_ID IN (SELECT CLI_ID
+                 FROM client
+                 WHERE NOM LIKE 'PHILIPPE'
+                       AND PRENOM LIKE 'André');
+
+DELETE FROM client
+WHERE NOM LIKE 'PHILIPPE'
+      AND PRENOM LIKE 'André';
+
+-- 1.4
+-- Un nouveau client vient de réserver la chambre numéro 6 pour 2 personnes, il faut l’ajouter
+-- la base de donnée :
+-- nom : Jensuis ; prenom : Pierre ; Homme ; c’est un client particulier
+-- adresse : 34 rue noir 34678 busez
+-- mail bureau : jensuis.pierre@icemail.fr
+-- téléphone domicile : 04-45-67-89-32, pas d’autre téléphone
+-- date de la réservation (date_jour) : aujourd’hui
+-- R em arque : les clés primaires des tables concernées sont auto incrémenté
+-- Les colonnes reserve et occupe de la table reservation prendront leur valeur par défaut
+INSERT INTO client
+VALUES (DEFAULT,'m.','Jensuis','Pierre',NULL);
+
+INSERT INTO email
+VALUES (DEFAULT, (SELECT CLI_ID
+                  FROM client
+                  WHERE NOM LIKE 'Jensuis' AND PRENOM LIKE 'Pierre'), 'jensuis.pierre@icemail.fr', 'bureau');
+
+INSERT INTO adresse
+VALUES (DEFAULT, (SELECT CLI_ID
+                  FROM client
+                  WHERE NOM LIKE 'Jensuis' AND PRENOM LIKE 'Pierre'), '34 rue noir', DEFAULT, DEFAULT, DEFAULT, '346', 'busez');
+
+INSERT INTO telephone
+VALUES (DEFAULT, (SELECT CLI_ID
+                  FROM client
+                  WHERE NOM LIKE 'Jensuis' AND PRENOM LIKE 'Pierre'), 'tel', '04-45-67-89-32', 'domicile');
+
+INSERT INTO RESERVER
+VALUES ((SELECT CHB_ID
+         FROM chambre
+         WHERE NUMERO = 6), CURRENT_DATE, (SELECT CLI_ID
+                                           FROM client
+                                           WHERE NOM LIKE 'Jensuis' AND PRENOM LIKE 'Pierre'), 2, DEFAULT, DEFAULT)
+
+
+-- 2.1 
+-- On doit supprimer de la table ligne_facture la colonne remise_pourcent, mais avant il faut
+-- mettre à jour la colonne remise_montant qui correspond au montant multiplié par la remise
+-- en
+-- pourcentage.
+-- Attention cette mise à jour se fera que quand la remise_montant est NULL.
+-- Ecrire le(s) requête(s) qui permettent de réaliser ces opérations ;
+UPDATE ligne_facture
+SET REMISE_MONTANT = MONTANT * (REMISE_POURCENT/100)
+WHERE REMISE_MONTANT IS NULL;
+
+ALTER TABLE ligne_facture
+DROP COLUMN REMISE_POURCENT;
+
+-- 2.2
+-- La colonne couchage de la table chambre doit changer de nom et de type, elle doit s’appeler
+-- nb_couchage et son type doit être un numérique de 2 chiffres sans décimal. Écrire la(les)
+-- requête(s) qui permet(tent) de réaliser cette opération ;
+ALTER TABLE chambre
+RENAME COLUMN COUCHAGE TO nb_couchage;
+
+ALTER TABLE chambre
+ALTER COLUMN COUCHAGE TYPE NUMERIC(2,0);
+
+
 
 
 
