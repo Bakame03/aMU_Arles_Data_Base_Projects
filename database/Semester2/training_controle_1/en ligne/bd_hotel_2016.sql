@@ -14192,8 +14192,39 @@ RENAME COLUMN COUCHAGE TO nb_couchage;
 ALTER TABLE chambre
 ALTER COLUMN COUCHAGE TYPE NUMERIC(2,0);
 
+-- 2.3
+-- Modifier la valeur par défaut de la colonne date_fac de la table facture, elle doit maintenant
+-- correspondre à la date courante (current_date). Écrire la requête qui permet de réaliser cette
+-- opération ;
+ALTER TABLE facture
+ALTER DATE_FAC SET DEFAULT CURRENT_DATE;
 
+-- 2.4
+-- Le diagramme de classes actuel (annexe 1) est incomplet, des modifications sont réalisées en
+-- annexe3. Ecrire le script SQL qui permet d’ajouter ces modifications ;
+CREATE TABLE type_tel( 
+    id_type_tel serial,
+    type_code varchar(8) not null,
+    descrip_type VARCHAR(50),   
+    primary key (id_type_tel),
+    constraint ck_type_code check(type_code IN('fax', 'tel','gsm'))
+);
 
+ALTER TABLE telephone
+ADD COLUMN id_type_tel INTEGER,
+ADD Constraint FK_telephone_type_tel FOREIGN KEY (id_type_tel) REFERENCES type_tel (id_type_tel);
+
+INSERT INTO type_tel(type_code, descrip_type)
+SELECT DISTINCT typ_code, CASE typ_code WHEN 'gsm'
+                               THEN 'portable'
+                               ELSE typ_code||' '||localisation
+                          END
+FROM telephone
+ORDER BY typ_code;
+
+ALTER TABLE telephone
+DROP COLUMN localisation,
+DROP COLUMN typ_code;
 
 
 
