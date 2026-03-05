@@ -1,0 +1,58 @@
+1.1 
+UPDATE grandprix
+SET DateGP = DateGP + INTERVAL '2 MONTH'
+WHERE extract(YEAR from DateGP) = 2017;
+
+1.2
+UPDATE pilote
+SET NomPilote = UPPER(NomPilote);
+
+1.3
+DELETE FROM sponsor
+WHERE NomSponsor NOT IN (SELECT NomSponsor
+                         FROM sponsor
+                         WHERE NomSponsor IN (SELECT NomSponsor
+                                              FROM sponsoriser)
+                         UNION
+                         SELECT NomSponsor
+                         FROM sponsor
+                         WHERE NomSponsor IN (SELECT NomSponsor
+                                              FROM soutenir));
+                                              
+1.4
+DELETE FROM Courir
+WHERE id_Pilote IN (SELECT id_Pilote
+                   FROM Pilote
+                   WHERE nomPilote='PALMER' AND prenomPilote='Jolyon') ;
+
+DELETE FROM soutenir
+WHERE id_Pilote IN (SELECT id_Pilote
+                   FROM Pilote
+                   WHERE nomPilote='PALMER' AND prenomPilote='Jolyon') ;
+
+DELETE FROM Pilote
+WHERE nomPilote='PALMER' AND prenomPilote='Jolyon' ;
+
+1.5
+INSERT INTO Circuit
+(default,'Circuit Paul-Ricard','France',5.810,10000);
+
+INSERT INTO GrandPrix
+VALUES(DEFAULT, (SELECT id_circuit
+                 FROM Circuit
+                 WHERE nomcircuit='Circuit Paul-Ricard' AND paysCircuit='France'), 'grand prix de France', 134, '2017-5-12',) ;
+
+--------------------------------------------------------------------------------
+
+
+2.1
+ALTER TABLE Pilote
+ADD COLUMN date_naiss Date,
+ADD COLUMN NumLicence INTEGER NOT NULL DEFAULT 0;
+
+2.2
+ALTER TABLE Ecurie
+ALTER COLUMN directeur TYPE varchar(15);
+
+2.3
+
